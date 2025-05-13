@@ -34,12 +34,13 @@ conn = psycopg2.connect(
 
 ndt_query = sql.SQL("""
             INSERT INTO ndt7_flat (
-                uuid, 
+                uuid,
                 test_time, 
-                city, 
-                country_iso, 
-                asn, 
-                packet_loss_rate, 
+                city,
+                region,
+                country_iso,
+                asn,
+                packet_loss_rate,
                 throughput_mbps,
                 download_latency_ms,
                 download_jitter,
@@ -77,7 +78,8 @@ files_with_errors = set()
 
 def insert_data_from_csv(csv_file, insert_query):
     try:
-        df = pd.read_csv(csv_file, dtype=str)
+        df = pd.read_csv(csv_file, dtype=str, keep_default_na=False)
+        df = df.replace('', None)
         df = df.where(pd.notnull(df), None)
 
         data_tuples = [tuple(x) for x in df.to_records(index=False)]
