@@ -14,7 +14,7 @@ WHERE packet_loss_rate IS NOT NULL
 	AND download_latency_ms IS NOT NULL
 	AND download_jitter IS NOT NULL
 	AND download_bytes IS NOT NULL
-	AND country_iso IN ('GT', 'PL', 'GH', 'BR', 'FJ')
+	AND country_iso IN ('GT', 'PL', 'GH', 'BR', 'NZ')
 ORDER BY country_iso
 
 SELECT
@@ -33,5 +33,5 @@ WHERE packet_loss_rate IS NOT NULL
 	AND upload_latency_ms IS NOT NULL
 	AND upload_jitter IS NOT NULL
 	AND upload_bytes IS NOT NULL
-	AND country_iso IN ('GT', 'PL', 'GH', 'BR', 'FJ')
+	AND country_iso IN ('GT', 'PL', 'GH', 'BR', 'NZ')
 ORDER BY country_iso

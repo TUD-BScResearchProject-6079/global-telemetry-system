@@ -13,7 +13,7 @@ SELECT
 	upload_jitter,
 	upload_bytes
 FROM cloudflare_flat
-WHERE country_iso IN ('GT', 'PL', 'GH', 'BR', 'FJ')
+WHERE country_iso IN ('GT', 'PL', 'GH', 'BR', 'NZ')
 	AND packet_loss_rate IS NOT NULL
 	AND download_throughput_mbps IS NOT NULL
 	AND download_jitter IS NOT NULL
