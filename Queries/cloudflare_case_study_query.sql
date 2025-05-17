@@ -11,9 +11,18 @@ SELECT
 	upload_throughput_mbps,
 	upload_latency_ms,
 	upload_jitter,
-	upload_bytes
+	upload_bytes,
+	CASE 
+        	WHEN country_iso IN ('US', 'CA') THEN 'North America'
+        	WHEN country_iso IN ('BR', 'AR') THEN 'South America'
+        	WHEN country_iso IN ('DE', 'FR') THEN 'Europe'
+        	WHEN country_iso IN ('GH', 'KE') THEN 'Africa'
+        	WHEN country_iso IN ('AU', 'NZ') THEN 'Oceania'
+        	WHEN country_iso IN ('PH', 'JP') THEN 'Asia'
+        	ELSE 'Unknown'
+    	END AS continent
 FROM cloudflare_flat
-WHERE country_iso IN ('GT', 'PL', 'GH', 'BR', 'NZ')
+WHERE country_iso IN ('US', 'CA', 'BR', 'AR', 'DE', 'FR', 'GH', 'KE', 'AU', 'NZ', 'PH', 'JP')
 	AND packet_loss_rate IS NOT NULL
 	AND download_throughput_mbps IS NOT NULL
 	AND download_jitter IS NOT NULL
