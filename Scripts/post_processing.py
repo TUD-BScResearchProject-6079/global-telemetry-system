@@ -11,7 +11,7 @@ def ndt_post_processing(conn: connection) -> None:
             cur.execute(ndt_standardize_cities_query)
         conn.commit()
         print(f'Successfully finished post-processing of NDT')
-    except Exception as e:
+    except Exception:
         conn.rollback()
         raise
 

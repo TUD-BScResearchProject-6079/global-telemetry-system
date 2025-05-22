@@ -20,7 +20,7 @@ conn = psycopg2.connect(
 
 countries_list = ['US', 'CA', 'BR', 'AG', 'GH', 'KE', 'FR', 'DE', 'PH', 'JP', 'AU', 'NZ']
 
-def print_menu():
+def print_menu() -> None:
     print("""
         Choose an operation:
         1 - Download CAIDA ASN Data

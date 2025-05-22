@@ -18,7 +18,7 @@ def prepare_data_for_case_study(conn: connection, countries: list[str]) -> None:
         for cf_table, cf_csv in cf_data.items():
             query = cf_case_study_query.format(sql.Identifier(f'cf_{cf_table}'), country_literals)
             cur.execute(query)
-            columns = [desc[0] for desc in cur.description]
+            columns: list[str] = [desc[0] for desc in cur.description]
             rows = cur.fetchall()
 
             full_path = os.path.join(path_to_save, cf_csv)

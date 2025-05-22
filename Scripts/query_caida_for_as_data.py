@@ -4,7 +4,7 @@ import sys
 
 from populate_tables import data_dir
 from graphqlclient import GraphQLClient
-from typing import Callable
+from typing import Callable, Any
 
 
 URL = "https://api.asrank.caida.org/v2/graphql"
@@ -12,7 +12,7 @@ PAGE_SIZE = 10000
 column_names = ["asn", "asnName", "rank", "country_code", "country_name"]
 decoder = json.JSONDecoder()
 
-def asn_query(first: int, offset: int) -> str:
+def asn_query(first: int, offset: int) -> list[str]:
     return [
         "asns",
         """{
@@ -38,12 +38,12 @@ def asn_query(first: int, offset: int) -> str:
     ]
 
 
-def download_data(url, query):
+def download_data(url: str, query: Any):
     client = GraphQLClient(url)
     return decoder.decode(client.execute(query))
 
 
-def download_list(url: str = URL, fname:str = "asns_query_results.csv", api_query: Callable[[int, int], str] = asn_query):
+def download_list(url: str = URL, fname: str = "asns_query_results.csv", api_query: Callable[[int, int], list[str]] = asn_query):
     hasNextPage = True
     first = PAGE_SIZE
     offset = 0

@@ -80,7 +80,7 @@ def populate_countries_w_starlink_measurements_table(conn: connection, csv_name:
     insert_data_from_csv(conn, csv_path, countries_with_starlink_measurements_insert_query)
 
 
-def _extract_alt_names(alt_str):
+def _extract_alt_names(alt_str: str) -> list[str]:
     if not alt_str:
         return [""] * 4
     parts = alt_str.split(",")

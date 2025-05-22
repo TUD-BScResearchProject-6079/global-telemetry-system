@@ -1,6 +1,8 @@
 import gc
 import pandas as pd
 
+from psycopg2 import sql
+from pathlib import Path
 from psycopg2.extensions import connection
 from psycopg2.extras import execute_values
 from typing import Callable
@@ -57,8 +59,9 @@ def create_countries_w_starlink_measurements_table(conn: connection) -> None:
         conn.commit()
 
 
-def insert_data_from_csv(conn: connection, csv_file_path, insert_query, clean_dataframe: Callable[[pd.DataFrame], None] = None) -> None:
+def insert_data_from_csv(conn: connection, csv_file_path: Path, insert_query: sql.SQL | sql.Composed, clean_dataframe: Callable[[pd.DataFrame], None] | None = None) -> None:
     with conn.cursor() as cur:
+        df = None
         try:
             df = pd.read_csv(csv_file_path, dtype=str, na_values=[""], keep_default_na=False)
             df = df.where(pd.notnull(df), None)
@@ -76,5 +79,6 @@ def insert_data_from_csv(conn: connection, csv_file_path, insert_query, clean_da
             conn.rollback()
 
         finally:
-            del df
+            if df is not None:
+                del df
             gc.collect()
