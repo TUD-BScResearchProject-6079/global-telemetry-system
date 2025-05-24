@@ -10,11 +10,11 @@ SELECT
 
   ROUND((SELECT SUM(bps * bytes) / SUM(bytes) / 1000000 FROM UNNEST(upload.bps) bps WITH OFFSET AS i JOIN UNNEST(download.bytes) bytes WITH OFFSET AS j ON i = j), 5) AS download_throughput_mbps,
   CAST(ROUND((SELECT AVG(lat) FROM UNNEST(loadedLatencyMs.download) lat), 0) AS INT) AS download_latency_ms,
-  ROUND(loadedJitterMs.download, 5) AS download_jitter,
+  ROUND(loadedJitterMs.download, 5) AS download_jitter_ms,
 
   ROUND((SELECT SUM(bps * bytes) / SUM(bytes) / 1000000 FROM UNNEST(upload.bps) bps WITH OFFSET AS i JOIN UNNEST(upload.bytes) bytes WITH OFFSET AS j ON i = j), 5) AS upload_throughput_mbps,
   CAST(ROUND((SELECT AVG(lat) FROM UNNEST(loadedLatencyMs.upload) lat), 0) AS INT) AS upload_latency_ms,
-  ROUND(loadedJitterMs.upload, 5) AS upload_jitter
+  ROUND(loadedJitterMs.upload, 5) AS upload_jitter_ms
 FROM `measurement-lab.cloudflare.speedtest_speed1`
 WHERE
   date >= '2025-05-05' AND date <= '2025-05-11'

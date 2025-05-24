@@ -14,14 +14,14 @@ SELECT
     ELSE NULL
   END AS download_throughput_mbps,
   CAST(ROUND(raw.Download.ServerMeasurements[SAFE_OFFSET(ARRAY_LENGTH(raw.Download.ServerMeasurements) - 1)].TCPInfo.RTT / 1000, 0) AS INT) AS download_latency_ms,
-  ROUND(raw.Download.ServerMeasurements[SAFE_OFFSET(ARRAY_LENGTH(raw.Download.ServerMeasurements) - 1)].TCPInfo.RTTVar / 1000, 5) AS download_jitter,
+  ROUND(raw.Download.ServerMeasurements[SAFE_OFFSET(ARRAY_LENGTH(raw.Download.ServerMeasurements) - 1)].TCPInfo.RTTVar / 1000, 5) AS download_jitter_ms,
   CASE
     WHEN raw.Upload.ServerMeasurements[SAFE_OFFSET(ARRAY_LENGTH(raw.Upload.ServerMeasurements) - 1)].TCPInfo.RTT IS NOT NULL
     THEN ROUND(a.MeanThroughputMbps, 5)
     ELSE NULL
   END AS upload_throughput_mbps,
   CAST(ROUND(raw.Upload.ServerMeasurements[SAFE_OFFSET(ARRAY_LENGTH(raw.Upload.ServerMeasurements) - 1)].TCPInfo.RTT / 1000, 0) AS INT) AS upload_latency_ms,
-  ROUND(raw.Upload.ServerMeasurements[SAFE_OFFSET(ARRAY_LENGTH(raw.Upload.ServerMeasurements) - 1)].TCPInfo.RTTVar / 1000, 5) AS upload_jitter
+  ROUND(raw.Upload.ServerMeasurements[SAFE_OFFSET(ARRAY_LENGTH(raw.Upload.ServerMeasurements) - 1)].TCPInfo.RTTVar / 1000, 5) AS upload_jitter_ms
 FROM `measurement-lab.ndt.ndt7`
 WHERE 
   date >= '2025-05-05'AND date <= '2025-05-11'

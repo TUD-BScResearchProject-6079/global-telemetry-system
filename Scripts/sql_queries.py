@@ -14,10 +14,10 @@ def get_cf_create_table_sql(table_name: str) -> str:
             packet_loss_rate NUMERIC(10, 5),
             download_throughput_mbps NUMERIC(10, 5),
             download_latency_ms INTEGER,
-            download_jitter NUMERIC(10, 5),
+            download_jitter_ms NUMERIC(10, 5),
             upload_throughput_mbps NUMERIC(10, 5),
             upload_latency_ms INTEGER,
-            upload_jitter NUMERIC(10, 5)
+            upload_jitter_ms NUMERIC(10, 5)
         );
 
         CREATE UNIQUE INDEX IF NOT EXISTS pk_cf_{table_name}
@@ -65,10 +65,10 @@ ndt_create_table_sql = """
         packet_loss_rate numeric(10,5) NOT NULL,
         download_throughput_mbps numeric(10,5),
         download_latency_ms integer,
-        download_jitter numeric(10,5),
+        download_jitter_ms numeric(10,5),
         upload_throughput_mbps numeric(10,5),
         upload_latency_ms integer,
-        upload_jitter numeric(10,5),
+        upload_jitter_ms numeric(10,5),
         CONSTRAINT ndt7_pkey PRIMARY KEY (uuid)
     );
 
@@ -138,10 +138,10 @@ ndt_insert_query = sql.SQL(
                 packet_loss_rate,
                 download_throughput_mbps,
                 download_latency_ms,
-                download_jitter,
+                download_jitter_ms,
                 upload_throughput_mbps,
                 upload_latency_ms,
-                upload_jitter
+                upload_jitter_ms
             ) VALUES %s
         """
 )
@@ -159,10 +159,10 @@ cf_insert_query = sql.SQL(
         packet_loss_rate,
         download_throughput_mbps,
         download_latency_ms,
-        download_jitter,
+        download_jitter_ms,
         upload_throughput_mbps,
         upload_latency_ms,
-        upload_jitter
+        upload_jitter_ms
     ) VALUES %s
 """
 )
@@ -278,18 +278,18 @@ cf_case_study_query = sql.SQL(
         packet_loss_rate,
         download_throughput_mbps,
         download_latency_ms,
-        download_jitter,
+        download_jitter_ms,
         upload_throughput_mbps,
         upload_latency_ms,
-        upload_jitter
+        upload_jitter_ms
     FROM {0}
     WHERE client_country_code IN ({1})
         AND packet_loss_rate IS NOT NULL
         AND download_throughput_mbps IS NOT NULL
-        AND download_jitter IS NOT NULL
+        AND download_jitter_ms IS NOT NULL
         AND upload_throughput_mbps IS NOT NULL
         AND upload_latency_ms IS NOT NULL
-        AND upload_jitter IS NOT NULL
+        AND upload_jitter_ms IS NOT NULL
     ORDER BY client_country_code
 """
 )
@@ -303,12 +303,12 @@ ndt_download_case_study = sql.SQL(
         packet_loss_rate,
         download_throughput_mbps,
         download_latency_ms,
-        download_jitter
+        download_jitter_ms
     FROM ndt7
     WHERE packet_loss_rate IS NOT NULL
         AND download_throughput_mbps IS NOT NULL
         AND download_latency_ms IS NOT NULL
-        AND download_jitter IS NOT NULL
+        AND download_jitter_ms IS NOT NULL
         AND client_country_code IN ({})
     ORDER BY client_country_code
 """
@@ -323,12 +323,12 @@ ndt_upload_case_study = sql.SQL(
         packet_loss_rate,
         upload_throughput_mbps,
         upload_latency_ms,
-        upload_jitter
+        upload_jitter_ms
     FROM ndt7
     WHERE packet_loss_rate IS NOT NULL
         AND upload_throughput_mbps IS NOT NULL
         AND upload_latency_ms IS NOT NULL
-        AND upload_jitter IS NOT NULL
+        AND upload_jitter_ms IS NOT NULL
         AND client_country_code IN ({})
     ORDER BY client_country_code
 """

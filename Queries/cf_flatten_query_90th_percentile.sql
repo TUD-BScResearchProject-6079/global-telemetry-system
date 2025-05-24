@@ -10,11 +10,11 @@ SELECT
 
   ROUND((SELECT PERCENTILE_DISC(bps, 0.9) OVER () FROM UNNEST(download.bps) AS bps LIMIT 1) / 1000000, 5) AS download_throughput_mbps,
   CAST(ROUND((SELECT PERCENTILE_DISC(ltc, 0.9) OVER () FROM UNNEST(loadedLatencyMs.download) AS ltc LIMIT 1), 0) AS INT) AS download_latency_ms,
-  ROUND(loadedJitterMs.download, 5) AS download_jitter,
+  ROUND(loadedJitterMs.download, 5) AS download_jitter_ms,
 
   ROUND((SELECT PERCENTILE_DISC(bps, 0.9) OVER () FROM UNNEST(upload.bps) AS bps LIMIT 1) / 1000000, 5) AS upload_throughput_mbps,
   CAST(ROUND((SELECT PERCENTILE_DISC(ltc, 0.9) OVER () FROM UNNEST(loadedLatencyMs.upload) AS ltc LIMIT 1), 0) AS INT) AS upload_latency_ms,
-  ROUND(loadedJitterMs.upload, 5) AS upload_jitter
+  ROUND(loadedJitterMs.upload, 5) AS upload_jitter_ms
 FROM `measurement-lab.cloudflare.speedtest_speed1`
 WHERE date >= '2025-05-05'
   AND date <= '2025-05-11'
