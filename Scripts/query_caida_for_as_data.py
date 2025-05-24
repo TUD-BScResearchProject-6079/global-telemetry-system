@@ -1,16 +1,16 @@
 import csv
 import json
 import sys
+from typing import Any, Callable
 
-from populate_tables import data_dir
 from graphqlclient import GraphQLClient
-from typing import Callable, Any
-
+from populate_tables import data_dir
 
 URL = "https://api.asrank.caida.org/v2/graphql"
 PAGE_SIZE = 10000
 column_names = ["asn", "asnName", "rank", "country_code", "country_name"]
 decoder = json.JSONDecoder()
+
 
 def asn_query(first: int, offset: int) -> list[str]:
     return [
@@ -34,23 +34,28 @@ def asn_query(first: int, offset: int) -> list[str]:
                     }
                 }
             }
-        }""" % (first, offset)
+        }"""
+        % (first, offset),
     ]
 
 
-def download_data(url: str, query: Any):
+def download_data(url: str, query: Any) -> Any:
     client = GraphQLClient(url)
     return decoder.decode(client.execute(query))
 
 
-def download_list(url: str = URL, fname: str = "asns_query_results.csv", api_query: Callable[[int, int], list[str]] = asn_query):
+def download_list(
+    url: str = URL,
+    fname: str = "asns_query_results.csv",
+    api_query: Callable[[int, int], list[str]] = asn_query,
+) -> None:
     hasNextPage = True
     first = PAGE_SIZE
     offset = 0
 
     path = data_dir / fname
     print("Writing to", path)
-    with open(path, "w", newline='', encoding="utf-8") as f:
+    with open(path, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=column_names)
         writer.writeheader()
 

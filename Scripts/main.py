@@ -1,13 +1,19 @@
 import os
-import psycopg2
 
 from dotenv import load_dotenv
-
-from populate_tables import populate_airport_codes_table, populate_cf_tables, populate_ndt_servers_table, populate_countries_w_starlink_measurements_table, \
-    populate_ndt_table, populate_cf_servers_table, populate_cities_table, populate_caida_asn_table
+from populate_tables import (
+    populate_airport_codes_table,
+    populate_caida_asn_table,
+    populate_cf_servers_table,
+    populate_cf_tables,
+    populate_cities_table,
+    populate_countries_w_starlink_measurements_table,
+    populate_ndt_servers_table,
+    populate_ndt_table,
+)
+import psycopg2
 from query_caida_for_as_data import download_list
 from query_tables import prepare_data_for_case_study
-
 
 load_dotenv()
 conn = psycopg2.connect(
@@ -15,13 +21,28 @@ conn = psycopg2.connect(
     dbname=os.getenv("DB_NAME"),
     user=os.getenv("DB_USER"),
     password=os.getenv("DB_PASSWORD"),
-    port=os.getenv("DB_PORT")
+    port=os.getenv("DB_PORT"),
 )
 
-countries_list = ['AR', 'US', 'CA', 'BR', 'GH', 'KE', 'FR', 'DE', 'PH', 'JP', 'AU', 'NZ']
+countries_list = [
+    "AR",
+    "US",
+    "CA",
+    "BR",
+    "GH",
+    "KE",
+    "FR",
+    "DE",
+    "PH",
+    "JP",
+    "AU",
+    "NZ",
+]
+
 
 def print_menu() -> None:
-    print("""
+    print(
+        """
         Choose an operation:
         1 - Download CAIDA ASN Data
         2 - Populate ASN Table
@@ -34,32 +55,34 @@ def print_menu() -> None:
         9 - Populate Cloudflare AIM Tables
         10 - Create Data for Case Study
         0 - Exit
-    """)
+    """
+    )
+
 
 print_menu()
 while True:
     choice = input("Enter your choice: ")
-    if choice == '1':
+    if choice == "1":
         download_list()
-    elif choice == '2':
+    elif choice == "2":
         populate_caida_asn_table(conn)
-    elif choice == '3':
+    elif choice == "3":
         populate_countries_w_starlink_measurements_table(conn)
-    elif choice == '4':
+    elif choice == "4":
         populate_cities_table(conn)
-    elif choice == '5':
+    elif choice == "5":
         populate_airport_codes_table(conn)
-    elif choice == '6':
+    elif choice == "6":
         populate_ndt_servers_table(conn)
-    elif choice == '7':
+    elif choice == "7":
         populate_cf_servers_table(conn)
-    elif choice == '8':
+    elif choice == "8":
         populate_ndt_table(conn)
-    elif choice == '9':
+    elif choice == "9":
         populate_cf_tables(conn)
-    elif choice == '10':
+    elif choice == "10":
         prepare_data_for_case_study(conn, countries_list)
-    elif choice == '0':
+    elif choice == "0":
         print("Exiting program.")
         break
     else:

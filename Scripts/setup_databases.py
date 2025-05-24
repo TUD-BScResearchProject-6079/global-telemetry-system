@@ -1,14 +1,21 @@
 import gc
-import pandas as pd
-
-from psycopg2 import sql
 from pathlib import Path
-from psycopg2.extensions import connection
-from psycopg2.extras import execute_values
 from typing import Callable
 
-from sql_queries import get_cf_create_table_sql, ndt_create_table_sql, airports_create_query, countries_with_starlink_measurements_create_query, \
-    ndt_best_servers_create_query, cf_best_servers_create_query, cities_create_query, caida_asn_create_table_query
+import pandas as pd
+from psycopg2 import sql
+from psycopg2.extensions import connection
+from psycopg2.extras import execute_values
+from sql_queries import (
+    airports_create_query,
+    caida_asn_create_table_query,
+    cf_best_servers_create_query,
+    cities_create_query,
+    countries_with_starlink_measurements_create_query,
+    get_cf_create_table_sql,
+    ndt_best_servers_create_query,
+    ndt_create_table_sql,
+)
 
 
 def create_ndt7_table(conn: connection) -> None:
@@ -19,7 +26,7 @@ def create_ndt7_table(conn: connection) -> None:
 
 def create_cf_tables(conn: connection) -> None:
     with conn.cursor() as cur:
-        for table in ['mean', 'median', '90th_percentile']:
+        for table in ["mean", "median", "90th_percentile"]:
             cur.execute(get_cf_create_table_sql(table))
         conn.commit()
 
@@ -34,6 +41,7 @@ def create_ndt_servers_table(conn: connection) -> None:
     with conn.cursor() as cur:
         cur.execute(ndt_best_servers_create_query)
         conn.commit()
+
 
 def create_cf_servers_table(conn: connection) -> None:
     with conn.cursor() as cur:
@@ -59,7 +67,12 @@ def create_countries_w_starlink_measurements_table(conn: connection) -> None:
         conn.commit()
 
 
-def insert_data_from_csv(conn: connection, csv_file_path: Path, insert_query: sql.SQL | sql.Composed, clean_dataframe: Callable[[pd.DataFrame], None] | None = None) -> None:
+def insert_data_from_csv(
+    conn: connection,
+    csv_file_path: Path,
+    insert_query: sql.SQL | sql.Composed,
+    clean_dataframe: Callable[[pd.DataFrame], None] | None = None,
+) -> None:
     with conn.cursor() as cur:
         df = None
         try:

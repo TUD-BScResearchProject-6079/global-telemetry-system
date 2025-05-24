@@ -50,6 +50,7 @@ def get_cf_create_table_sql(table_name: str) -> str:
     """
     return create_cf_table_sql
 
+
 ndt_create_table_sql = """
     CREATE TABLE IF NOT EXISTS public.ndt7
     (
@@ -100,7 +101,8 @@ ndt_create_table_sql = """
         TABLESPACE pg_default;
 """
 
-cities_create_query = sql.SQL("""
+cities_create_query = sql.SQL(
+    """
     CREATE TABLE IF NOT EXISTS public.cities
     (
         name character varying(200) COLLATE pg_catalog."default" NOT NULL,
@@ -112,14 +114,18 @@ cities_create_query = sql.SQL("""
         region character varying(200) COLLATE pg_catalog."default" NOT NULL,
         country_code character(2) COLLATE pg_catalog."default"
     )
-""")
+"""
+)
 
-cities_insert_query = sql.SQL("""
+cities_insert_query = sql.SQL(
+    """
     INSERT INTO cities (name, asciiname, name1, name2, name3, name4, region, country_code)
     VALUES %s
-""")
+"""
+)
 
-ndt_insert_query = sql.SQL("""
+ndt_insert_query = sql.SQL(
+    """
             INSERT INTO ndt7 (
                 uuid,
                 test_time,
@@ -137,9 +143,11 @@ ndt_insert_query = sql.SQL("""
                 upload_latency_ms,
                 upload_jitter
             ) VALUES %s
-        """)
+        """
+)
 
-cf_insert_query = sql.SQL("""
+cf_insert_query = sql.SQL(
+    """
     INSERT INTO {} (
         uuid,
         test_time,
@@ -156,7 +164,8 @@ cf_insert_query = sql.SQL("""
         upload_latency_ms,
         upload_jitter
     ) VALUES %s
-""")
+"""
+)
 
 airports_create_query = """
     CREATE TABLE IF NOT EXISTS airport_country (
@@ -165,10 +174,12 @@ airports_create_query = """
     );
 """
 
-airport_insert_query = sql.SQL("""
+airport_insert_query = sql.SQL(
+    """
     INSERT INTO airport_country (country_code, airport_code)
     VALUES %s
-""")
+"""
+)
 
 ndt_best_servers_create_query = """
     CREATE TABLE IF NOT EXISTS ndt_server_for_country (
@@ -178,10 +189,12 @@ ndt_best_servers_create_query = """
     );
 """
 
-ndt_best_server_insert_query = sql.SQL("""
+ndt_best_server_insert_query = sql.SQL(
+    """
     INSERT INTO ndt_server_for_country (client_country, server_city, server_country)
     VALUES %s
-""")
+"""
+)
 
 cf_best_servers_create_query = """
     CREATE TABLE IF NOT EXISTS cf_server_for_country (
@@ -190,12 +203,15 @@ cf_best_servers_create_query = """
     );
 """
 
-cf_best_server_insert_query = sql.SQL("""
+cf_best_server_insert_query = sql.SQL(
+    """
     INSERT INTO cf_server_for_country (client_country, server_airport_code)
     VALUES %s
-""")
+"""
+)
 
-cf_delete_abnormal_servers_query = sql.SQL("""
+cf_delete_abnormal_servers_query = sql.SQL(
+    """
     DELETE FROM {} cf
     USING
         airport_country ac
@@ -207,9 +223,11 @@ cf_delete_abnormal_servers_query = sql.SQL("""
             FROM cf_server_for_country sv
             WHERE cf.client_country_code = sv.client_country
         );
-""")
+"""
+)
 
-ndt_delete_abnormal_servers_query = sql.SQL("""
+ndt_delete_abnormal_servers_query = sql.SQL(
+    """
     DELETE
     FROM ndt7 n
     WHERE n.client_country_code <> n.server_country_code
@@ -217,12 +235,14 @@ ndt_delete_abnormal_servers_query = sql.SQL("""
             SELECT DISTINCT server_city, server_country
             FROM ndt_server_for_country sv
             WHERE sv.client_country = n.client_country_code
-	);
-""")
+        );
+"""
+)
 
-ndt_standardize_cities_query = sql.SQL("""
-    UPDATE ndt7 n 
-    SET 
+ndt_standardize_cities_query = sql.SQL(
+    """
+    UPDATE ndt7 n
+    SET
         client_city = c.asciiname,
         client_region = c.region
     FROM cities c
@@ -231,11 +251,13 @@ ndt_standardize_cities_query = sql.SQL("""
         AND n.client_city <> ''
         AND n.client_city IN (c.name, c.asciiname, c.name1, c.name2, c.name3, c.name4)
         AND n.client_country_code = c.country_code;
-""")
+"""
+)
 
-cf_standardize_cities_query = sql.SQL("""
-    UPDATE {} cf 
-    SET 
+cf_standardize_cities_query = sql.SQL(
+    """
+    UPDATE {} cf
+    SET
         client_city = c.asciiname,
         client_region = c.region
     FROM cities c
@@ -244,9 +266,11 @@ cf_standardize_cities_query = sql.SQL("""
         AND cf.client_city <> ''
         AND cf.client_city IN (c.name, c.asciiname, c.name1, c.name2, c.name3, c.name4)
         AND cf.client_country_code = c.country_code;
-""")
+"""
+)
 
-cf_case_study_query = sql.SQL("""
+cf_case_study_query = sql.SQL(
+    """
     SELECT
         client_country_code,
         test_time,
@@ -267,9 +291,11 @@ cf_case_study_query = sql.SQL("""
         AND upload_latency_ms IS NOT NULL
         AND upload_jitter IS NOT NULL
     ORDER BY client_country_code
-""")
+"""
+)
 
-ndt_download_case_study = sql.SQL("""
+ndt_download_case_study = sql.SQL(
+    """
     SELECT
         client_country_code,
         test_time,
@@ -279,15 +305,17 @@ ndt_download_case_study = sql.SQL("""
         download_latency_ms,
         download_jitter
     FROM ndt7
-    WHERE packet_loss_rate IS NOT NULL 
+    WHERE packet_loss_rate IS NOT NULL
         AND download_throughput_mbps IS NOT NULL
         AND download_latency_ms IS NOT NULL
         AND download_jitter IS NOT NULL
         AND client_country_code IN ({})
     ORDER BY client_country_code
-""")
+"""
+)
 
-ndt_upload_case_study = sql.SQL("""
+ndt_upload_case_study = sql.SQL(
+    """
     SELECT
         client_country_code,
         test_time,
@@ -297,15 +325,17 @@ ndt_upload_case_study = sql.SQL("""
         upload_latency_ms,
         upload_jitter
     FROM ndt7
-    WHERE packet_loss_rate IS NOT NULL 
+    WHERE packet_loss_rate IS NOT NULL
         AND upload_throughput_mbps IS NOT NULL
         AND upload_latency_ms IS NOT NULL
         AND upload_jitter IS NOT NULL
         AND client_country_code IN ({})
     ORDER BY client_country_code
-""")
+"""
+)
 
-caida_asn_create_table_query = sql.SQL("""
+caida_asn_create_table_query = sql.SQL(
+    """
     CREATE TABLE IF NOT EXISTS public.as_statistics
     (
         asn bigint NOT NULL,
@@ -315,11 +345,15 @@ caida_asn_create_table_query = sql.SQL("""
         country_name character varying(512) COLLATE pg_catalog."default",
         CONSTRAINT as_statistics_pkey PRIMARY KEY (asn)
     );
-""")
+"""
+)
 
-caida_asn_insert_query = sql.SQL("INSERT INTO as_statistics (asn, asn_name, rank, country_code, country_name) VALUES %s")
+caida_asn_insert_query = sql.SQL(
+    "INSERT INTO as_statistics (asn, asn_name, rank, country_code, country_name) VALUES %s"
+)
 
-top_five_isps_countries_with_starlink_measurements = sql.SQL("""
+top_five_isps_countries_with_starlink_measurements = sql.SQL(
+    """
     WITH rank_within_country_view AS (
         SELECT asn, RANK() OVER (PARTITION BY country_name ORDER BY rank ASC) AS rank_within_country
         FROM AS_Statistics
@@ -330,14 +364,21 @@ top_five_isps_countries_with_starlink_measurements = sql.SQL("""
         JOIN countries_with_starlink_measurements c ON a.country_code = c.country_code
     WHERE b.rank_within_country <= 5 OR a.asn = 14593
     ORDER BY a.country_name, b.rank_within_country
-""")
+"""
+)
 
-countries_with_starlink_measurements_create_query = sql.SQL("""
+countries_with_starlink_measurements_create_query = sql.SQL(
+    """
     CREATE TABLE IF NOT EXISTS public.countries_with_starlink_measurements
     (
         country_code CHAR(2) COLLATE pg_catalog."default" NOT NULL,
-        CONSTRAINT countries_with_starlink_measurements_pkey PRIMARY KEY (country_iso)
+        CONSTRAINT countries_with_starlink_measurements_pkey PRIMARY KEY (country_code)
     )
-""")
+"""
+)
 
-countries_with_starlink_measurements_insert_query = sql.SQL("INSERT INTO countries_with_starlink_measurements (country_code) VALUES %s")
+countries_with_starlink_measurements_insert_query = sql.SQL(
+    """
+    INSERT INTO countries_with_starlink_measurements (country_code) VALUES %s
+"""
+)
