@@ -1,0 +1,4 @@
+measurement_group,median_packet_loss_rate,median_download_throughput_mbps,median_download_latency_ms,median_download_jitter_ms,median_upload_throughput_mbps,median_upload_latency_ms,median_upload_jitter_ms,measurements
+All Measurements,0.00000,38.91341,67,3.01700,13.21189,75,12.86100,7151582
+Kept Measurements (After Filtering),0.00000,38.14899,66,3.09100,12.70902,74,13.23700,6696934
+Removed Measurements (Filtered Out),0.00000,50.44435,77,2.00600,20.08295,89,8.18500,454648

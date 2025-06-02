@@ -27,6 +27,8 @@ from sql_queries import (
     ndt_best_server_insert_query,
     ndt_insert_query,
 )
+from query_tables import save_cf_filtered_servers_results, save_ndt_filtered_servers_results
+
 
 data_dir = Path(__file__).parent / "data"
 
@@ -35,6 +37,7 @@ def populate_ndt_table(conn: connection, csv_name: str = "ndt7-flat.csv") -> Non
     create_ndt7_table(conn)
     csv_path = data_dir / csv_name
     insert_data_from_csv(conn, csv_path, ndt_insert_query)
+    save_ndt_filtered_servers_results(conn)
     ndt_post_processing(conn)
 
 
@@ -51,15 +54,16 @@ def populate_cf_tables(
         csv_path = data_dir / csv_name
         query = cf_insert_query.format(sql.Identifier(f"cf_{table_name}"))
         insert_data_from_csv(conn, csv_path, query)
+        if table_name == "median":
+            save_cf_filtered_servers_results(conn)
         cf_post_processing(conn, table_name)
 
 
-def populate_ndt_servers_table(
-    conn: connection, csv_name: str = "ndt-servers-per-country.csv"
-) -> None:
+def populate_ndt_servers_table(conn: connection, csv_name: str = "ndt-best-servers.csv") -> None:
     def _clean_servers(df: pd.DataFrame) -> None:
-        df.dropna(subset=["client_country", "server_city", "server_country"], inplace=True)
-        df.drop(df[df["client_country"] == df["server_country"]].index, inplace=True)
+        df.dropna(
+            subset=["client_city", "client_country", "server_city", "server_country"], inplace=True
+        )
 
     create_ndt_servers_table(conn)
     csv_path = data_dir / csv_name
@@ -68,18 +72,17 @@ def populate_ndt_servers_table(
     )
 
 
-def populate_cf_servers_table(
-    conn: connection, csv_name: str = "cf-servers-per-country.csv"
-) -> None:
+def populate_cf_servers_table(conn: connection, csv_name: str = "cf-best-servers.csv") -> None:
     def _clean_codes(df: pd.DataFrame) -> None:
         df.rename(
             columns={
+                "clientCity": "client_city",
                 "clientCountry": "client_country",
                 "serverPoP": "server_airport_code",
             },
             inplace=True,
         )
-        mask = df["client_country"].str.len().gt(2) | df["server_airport_code"].str.len().gt(3)
+        mask = df["client_country"].str.len().ne(2) | df["server_airport_code"].str.len().ne(3)
         df.drop(index=df[mask].index, inplace=True)
 
     create_cf_servers_table(conn)
@@ -91,7 +94,7 @@ def populate_airport_codes_table(conn: connection, csv_name: str = "airport-code
     def _preprocess_df(df: pd.DataFrame) -> None:
         df.dropna(subset=["iata_code"], inplace=True)
         for col in df.columns:
-            if col not in ["iso_country", "iata_code"]:
+            if col not in ["iso_country", "iata_code", "municipality"]:
                 df.drop(columns=col, inplace=True)
         df.rename(
             columns={"iso_country": "country_code", "iata_code": "airport_code"},
@@ -126,7 +129,7 @@ def _extract_alt_names(alt_str: str) -> list[str]:
 
 def populate_cities_table(
     conn: connection,
-    cities_txt_name: str = "cities15000.txt",
+    cities_txt_name: str = "cities1000.txt",
     admin1_txt_name: str = "admin1CodesASCII.txt",
 ) -> None:
     create_cities_table(conn)
@@ -216,7 +219,7 @@ def populate_cities_table(
             "name3",
             "name4",
             "region",
-            "country_iso",
+            "country_code",
         ]
     )
 

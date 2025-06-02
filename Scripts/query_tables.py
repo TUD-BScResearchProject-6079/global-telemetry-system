@@ -3,19 +3,21 @@ import os
 from pathlib import Path
 
 from psycopg2 import sql
-from psycopg2.extensions import connection
+from psycopg2.extensions import connection, cursor
 from sql_queries import (
     cf_case_study_query,
+    cf_filter_servers_study_query,
     ndt_download_case_study,
+    ndt_filter_servers_study_query,
     ndt_upload_case_study,
-    top_five_isps_countries_with_starlink_measurements,
 )
 
-path_to_save = (
+path_to_case_study = (
     Path(__file__).resolve().parent.parent
     / "Case Study Distributions ndt7 and Cloudflare AIM"
     / "data"
 )
+path_to_output = Path(__file__).resolve().parent / "output"
 cf_data = {
     "mean": "cloudflare_case_study_mean.csv",
     "median": "cloudflare_case_study_median.csv",
@@ -38,7 +40,7 @@ def prepare_data_for_case_study(conn: connection, countries: list[str]) -> None:
                 columns = [desc[0] for desc in cur.description]
             rows = cur.fetchall()
 
-            full_path = os.path.join(path_to_save, cf_csv)
+            full_path = os.path.join(path_to_case_study, cf_csv)
             with open(full_path, "w", newline="", encoding="utf-8") as f:
                 writer = csv.writer(f)
                 writer.writerow(columns)
@@ -49,7 +51,7 @@ def prepare_data_for_case_study(conn: connection, countries: list[str]) -> None:
         if cur.description is not None:
             columns = [desc[0] for desc in cur.description]
         rows = cur.fetchall()
-        full_path = os.path.join(path_to_save, ndt_data["download"])
+        full_path = os.path.join(path_to_case_study, ndt_data["download"])
         with open(full_path, "w", newline="", encoding="utf-8") as f:
             writer = csv.writer(f)
             writer.writerow(columns)
@@ -60,17 +62,38 @@ def prepare_data_for_case_study(conn: connection, countries: list[str]) -> None:
         if cur.description is not None:
             columns = [desc[0] for desc in cur.description]
         rows = cur.fetchall()
-        full_path = os.path.join(path_to_save, ndt_data["upload"])
+        full_path = os.path.join(path_to_case_study, ndt_data["upload"])
         with open(full_path, "w", newline="", encoding="utf-8") as f:
             writer = csv.writer(f)
             writer.writerow(columns)
             writer.writerows(rows)
 
 
-def get_top_five_isps_countries_with_starlink_measurements(conn: connection) -> None:
-    columns: list[str] = []
+def save_cf_filtered_servers_results(conn: connection) -> None:
     with conn.cursor() as cur:
-        cur.execute(top_five_isps_countries_with_starlink_measurements)
-        if cur.description is not None:
-            columns = [desc[0] for desc in cur.description]
-        rows = cur.fetchall()
+        cur.execute(cf_filter_servers_study_query)
+        cf_rows = cur.fetchall()
+        if cur.description is None:
+            raise ValueError("No data returned from Cloudflare filter servers query.")
+        cf_columns = [desc[0] for desc in cur.description]
+        cf_output_path = path_to_output / "cloudflare_filtered_servers_results.csv"
+        with open(cf_output_path, "w", newline="", encoding="utf-8") as f:
+            writer = csv.writer(f)
+            writer.writerow(cf_columns)
+            writer.writerows(cf_rows)
+    print(f"Cloudflare filtered servers results saved to {cf_output_path}")
+
+
+def save_ndt_filtered_servers_results(conn: connection) -> None:
+    with conn.cursor() as cur:
+        cur.execute(ndt_filter_servers_study_query)
+        ndt_rows = cur.fetchall()
+        if cur.description is None:
+            raise ValueError("No data returned from Cloudflare filter servers query.")
+        ndt_columns = [desc[0] for desc in cur.description]
+        ndt_output_path = path_to_output / "ndt_filtered_servers_results.csv"
+        with open(ndt_output_path, "w", newline="", encoding="utf-8") as f:
+            writer = csv.writer(f)
+            writer.writerow(ndt_columns)
+            writer.writerows(ndt_rows)
+    print(f"NDT filtered servers results saved to {ndt_output_path}")
